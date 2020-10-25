@@ -1,0 +1,70 @@
+# This file exists so you can easily regenerate your project.
+#
+# `cookiepatcher` is a convenient shim around `cookiecutter`
+# for regenerating projects (it will generate a .cookiecutterrc
+# automatically for any template). To use it:
+#
+#    pip install cookiepatcher
+#    cookiepatcher gh:ionelmc/cookiecutter-pylibrary gem_python
+#
+# See:
+#    https://pypi.org/project/cookiepatcher
+#
+# Alternatively, you can run:
+#
+#    cookiecutter --overwrite-if-exists --config-file=gem_python/.cookiecutterrc gh:ionelmc/cookiecutter-pylibrary
+
+default_context:
+
+    _extensions:               ['jinja2_time.TimeExtension']
+    _template:                 'gh:ionelmc/cookiecutter-pylibrary'
+    allow_tests_inside_package: 'no'
+    appveyor:                  'no'
+    c_extension_function:      'longest'
+    c_extension_module:        '_gem_python'
+    c_extension_optional:      'no'
+    c_extension_support:       'no'
+    c_extension_test_pypi:     'no'
+    c_extension_test_pypi_username: 'rebirthxi'
+    codacy:                    'no'
+    codacy_projectid:          '[Get ID from https://app.codacy.com/app/rebirthxi/gem_python/settings]'
+    codeclimate:               'no'
+    codecov:                   'no'
+    command_line_interface:    'no'
+    command_line_interface_bin_name: 'gem-python'
+    coveralls:                 'no'
+    coveralls_token:           '[Required for Appveyor, take it from https://coveralls.io/github/rebirthxi/gem_python]'
+    distribution_name:         'gem-python'
+    email:                     'korisd@gmail.com'
+    full_name:                 'Daniel Koris'
+    landscape:                 'no'
+    license:                   'MIT license'
+    linter:                    'flake8'
+    package_name:              'gem_python'
+    pre_commit:                'no'
+    project_name:              'Shattered Gem python'
+    project_short_description: 'A python package containing all the libraries needed for the python portion of the FFXI Server Emulator: "Shattered Gem"'
+    pypi_badge:                'no'
+    pypi_disable_upload:       'no'
+    release_date:              'today'
+    repo_hosting:              'github.com'
+    repo_hosting_domain:       'github.com'
+    repo_name:                 'gem_python'
+    repo_username:             'rebirthxi'
+    requiresio:                'no'
+    scrutinizer:               'no'
+    setup_py_uses_setuptools_scm: 'no'
+    setup_py_uses_test_runner: 'no'
+    sphinx_docs:               'yes'
+    sphinx_docs_hosting:       'https://gem_python.readthedocs.io/'
+    sphinx_doctest:            'no'
+    sphinx_theme:              'sphinx-py3doc-enhanced-theme'
+    test_matrix_configurator:  'no'
+    test_matrix_separate_coverage: 'no'
+    test_runner:               'pytest'
+    travis:                    'no'
+    travis_osx:                'no'
+    version:                   '0.0.1'
+    website:                   'www.rebirthxi.com'
+    year_from:                 '2020'
+    year_to:                   '2030'
