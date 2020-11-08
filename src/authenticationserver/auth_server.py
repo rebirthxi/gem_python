@@ -14,7 +14,7 @@ class AuthServerProtocol(asyncio.Protocol):
 
     def connection_made(self, transport: asyncio.transports.BaseTransport) -> None:
         self.peername = transport.get_extra_info('peername')
-        print('Connection from {}'.format(self.peername))
+        print('Auth connection from {}'.format(self.peername))
         self.transport = transport
 
     def data_received(self, data: bytes) -> None:

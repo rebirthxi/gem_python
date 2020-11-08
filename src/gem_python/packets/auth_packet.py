@@ -11,10 +11,10 @@ class AuthRequestSizeError(Exception):
 class AuthResponsePacket(BasicPacket):
     def __init__(self):
         self.accid = 0
-        self.status = AccountStatus.NORMAL
+        self.status = AccountStatus.BANNED
 
     def to_bytes(self) -> bytes:
-        return self.status.to_bytes(1, byteorder="big") + self.accid.to_bytes(4, byteorder="big")
+        return self.status.to_bytes(1, byteorder="little") + self.accid.to_bytes(4, byteorder="little")
 
     def from_bytes(self, data) -> None:
         pass
@@ -33,8 +33,8 @@ class AuthRequestPacket(BasicPacket):
 
     def from_bytes(self, data: bytes) -> None:
         if len(data) == self.PACKET_SIZE:
-            self.name   = data[0:15].decode("utf-8").strip("\x00")
-            self.passwd = data[16:31].decode("utf-8").strip("\x00")
+            self.name   = data[0:16].decode("utf-8").strip("\x00")
+            self.passwd = data[16:32].decode("utf-8").strip("\x00")
             self.code   = data[32]
         else:
             raise AuthRequestSizeError("len(data) == self.PACKET_SIZE", "Read data not equal to desired packet size.")

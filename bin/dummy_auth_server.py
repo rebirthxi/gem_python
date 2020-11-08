@@ -1,10 +1,12 @@
 import asyncio
 from authenticationserver.auth_server import AuthServerProtocol
 from authenticationserver.auth_enum import AccountStatus
+from gatewayserver.gateway_server import GatewayServerProtocol
+from lobbyserver.lobby_server import LobbyServerProtocol
 from dataserver.interfaces.data_handle import DataHandle
 
 
-class FakeDatahandle(DataHandle):
+class FakeDataHandle(DataHandle):
     def AuthenticateAccount(self, account_name, passwd):
         if account_name == "test" and passwd == "test":
             print("Authentication good")
@@ -14,16 +16,30 @@ class FakeDatahandle(DataHandle):
 
 async def main():
     authed_accounts = {}
-    datahandle      = FakeDatahandle()
+    data_handle     = FakeDataHandle()
 
     loop = asyncio.get_running_loop()
-    server = await loop.create_server(
-        lambda: AuthServerProtocol(datahandle, authed_accounts),
+    auth_server = await loop.create_server(
+        lambda: AuthServerProtocol(data_handle, authed_accounts),
         '192.168.81.131', 54231
     )
 
-    async with server:
-        await server.serve_forever()
+    gateway_server = await loop.create_server(
+        lambda: GatewayServerProtocol(authed_accounts),
+        '192.168.81.131', 54230
+    )
+
+    lobby_server = await loop.create_server(
+        lambda: LobbyServerProtocol(authed_accounts),
+        '192.168.81.131', 54001
+    )
+
+    async with auth_server, gateway_server, lobby_server:
+        await asyncio.gather(
+            auth_server.serve_forever(),
+            gateway_server.serve_forever(),
+            lobby_server.serve_forever()
+        )
 
 
 if __name__ == "__main__":
