@@ -7,7 +7,3 @@ class BasicPacket(ABC):
     @abstractmethod
     def to_bytes(self) -> bytes:
         pass
-
-    @abstractmethod
-    def from_bytes(self, data: bytes) -> None:
-        pass

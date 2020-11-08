@@ -19,8 +19,7 @@ class AuthServerProtocol(asyncio.Protocol):
 
     def data_received(self, data: bytes) -> None:
         try:
-            request = AuthRequestPacket()
-            request.from_bytes(data)
+            request = AuthRequestPacket(data)
 
             if request.code == AuthCode.LOGIN_ATTEMPT:
                 response = self.login_attempt(request.name, request.passwd)

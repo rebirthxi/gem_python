@@ -1,11 +1,13 @@
 import asyncio
-from gem_python.packets.ver_check_packet import VerCheckResponse
+import gem_python.packets.ver_check_packet as ver_packets
+
 
 class LobbyServerProtocol(asyncio.Protocol):
-    def __init__(self, authed_accounts: dict):
+    def __init__(self, authed_accounts: dict, client_version: str):
         self.authed_accounts = authed_accounts
         self.peername        = ()
         self.transport       = None  # type: asyncio.transports.BaseTransport
+        self.client_version  = client_version
 
     def connection_made(self, transport: asyncio.transports.BaseTransport) -> None:
         self.peername = transport.get_extra_info('peername')
@@ -18,7 +20,12 @@ class LobbyServerProtocol(asyncio.Protocol):
         print("lobby:")
 
         if data[8] == 0x26:
-            print("sending response")
-            response = VerCheckResponse()
+            request = ver_packets.VerCheckRequest(data)
+
+            if self.client_version != request.version:
+                print("Client version : {}\nServer requires: {}".format(request.version, self.client_version))
+                response = ver_packets.VerCheckResponseBad()
+            else:
+                response = ver_packets.VerCheckResponseGood()
 
             self.transport.write(response.to_bytes())

@@ -30,7 +30,7 @@ async def main():
     )
 
     lobby_server = await loop.create_server(
-        lambda: LobbyServerProtocol(authed_accounts),
+        lambda: LobbyServerProtocol(authed_accounts, "302007xx_x"),
         '192.168.81.131', 54001
     )
 
