@@ -1,5 +1,6 @@
 import asyncio
 import gem_python.packets.ver_check_packet as ver_packets
+from lobbyserver.lobby_enum import LobbyCode
 
 
 class LobbyServerProtocol(asyncio.Protocol):
@@ -18,8 +19,9 @@ class LobbyServerProtocol(asyncio.Protocol):
 
     def data_received(self, data: bytes) -> None:
         print("lobby:")
+        lobby_code = data[8]
 
-        if data[8] == 0x26:
+        if lobby_code == LobbyCode.VERSION_CHECK:
             request = ver_packets.VerCheckRequest(data)
 
             if self.client_version != request.version:
@@ -29,3 +31,8 @@ class LobbyServerProtocol(asyncio.Protocol):
                 response = ver_packets.VerCheckResponseGood()
 
             self.transport.write(response.to_bytes())
+        elif lobby_code == LobbyCode.IP_AUTH_CHECK:
+            ip = self.peername[0]
+            print(self.peername)
+        else:
+            print("Data code is {}".format(data[8]))

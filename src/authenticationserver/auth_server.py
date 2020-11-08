@@ -45,7 +45,14 @@ class AuthServerProtocol(asyncio.Protocol):
         accid, status = self.authenticator.AuthenticateAccount(name, passwd)
 
         if status == AccountStatus.NORMAL:
-            self.authed_accounts[self.peername] = self.peername
+            account_info = {"acct_name": name, "acct_id": accid}
+            ip           = self.peername[0]
+
+            if self.peername in self.authed_accounts.keys():
+                self.authed_accounts[ip].append(account_info)
+            else:
+                self.authed_accounts[ip] = [account_info]
+
             response.status = status
             response.accid  = accid
 
