@@ -1,24 +1,61 @@
-import asyncore
-from authenticationserver.auth_handler import AuthHandler
+import asyncio
+from authenticationserver.auth_enum import AuthCode, AccountStatus
+from gem_python.packets.auth_packet import AuthRequestPacket, AuthResponsePacket, AuthRequestSizeError
 from dataserver.interfaces.data_handle import DataHandle
 
 
-class AuthServer(asyncore.dispatcher):
-    def __init__(self, host, port, account_authenticator, authed_accounts):
-        """
-        :type authenticator: DataHandle
-        :param host:
-        :param port:
-        :param authenticator:
-        """
-        asyncore.dispatcher.__init__(self)
-        self.authenticator   = account_authenticator
+class AuthServerProtocol(asyncio.Protocol):
+    def __init__(self, authenticator: DataHandle, authed_accounts: dict):
+        # super(self, AuthServerProtocol).__init__()
+        self.authenticator   = authenticator
         self.authed_accounts = authed_accounts
-        self.create_socket()
-        self.set_reuse_addr()
-        self.bind((host, port))
-        self.listen(5)
+        self.peername        = ()
+        self.transport       = None  # type: asyncio.transports.BaseTransport
 
-    def handle_accepted(self, sock, ip_port):
-        handler = AuthHandler(sock, ip_port, self.authenticator, self.authed_accounts)
-        print("Connection Created")
+    def connection_made(self, transport: asyncio.transports.BaseTransport) -> None:
+        self.peername = transport.get_extra_info('peername')
+        print('Connection from {}'.format(self.peername))
+        self.transport = transport
+
+    def data_received(self, data: bytes) -> None:
+        try:
+            request = AuthRequestPacket()
+            request.from_bytes(data)
+
+            if request.code == AuthCode.LOGIN_ATTEMPT:
+                response = self.login_attempt(request.name, request.passwd)
+
+                if response.status == AccountStatus.NORMAL:
+                    print("Authentication complete, closing auth socket!")
+                else:
+                    print("Authentication failed.")
+                self.transport.write(response.to_bytes())
+                self.transport.close()
+            else:
+                print("Unknown request code")
+                self.transport.close()
+
+        except AuthRequestSizeError as e:
+            print("When doing {} encountered the following error {}".format(e.expression, e.message))
+            self.transport.close()
+
+    def login_attempt(self, name: str, passwd: str) -> AuthResponsePacket:
+        response = AuthResponsePacket()
+
+        # if authenticated
+        accid, status = self.authenticator.AuthenticateAccount(name, passwd)
+
+        if status == AccountStatus.NORMAL:
+            self.authed_accounts[self.peername] = self.peername
+            response.status = status
+            response.accid  = accid
+
+        elif status == AccountStatus.BANNED:
+            response.status = AccountStatus.BANNED
+            response.accid  = 0
+
+        else:
+            response.status = AccountStatus.NOACCT
+            response.accid  = 0
+
+        return response

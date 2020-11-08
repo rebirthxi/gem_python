@@ -8,8 +8,9 @@ class AuthCode(IntEnum):
 
 
 class AccountStatus(IntEnum):
-    ACCOUNT_NORMAL = 0x01
-    ACCOUNT_BANNED = 0x02
+    NOACCT = 0x00
+    NORMAL = 0x01
+    BANNED = 0x02
 
 
 class LoginResult(IntEnum):
